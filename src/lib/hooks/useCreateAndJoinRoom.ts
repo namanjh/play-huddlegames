@@ -13,11 +13,7 @@ export function useCreateAndJoinRoom(gameSlug: string) {
       setLoading(true);
       setError(null);
 
-      // 1. Create Room
-      const createResponse = await fetch('/api/create-room', {
-        method: 'POST',
-      });
-
+      const createResponse = await fetch('/api/create-room', { method: 'POST' });
       const createData = await createResponse.json();
 
       if (!createResponse.ok) {
@@ -28,7 +24,6 @@ export function useCreateAndJoinRoom(gameSlug: string) {
 
       const createdRoomCode = createData.room.room_code;
 
-      // 2. Join Room
       const joinResponse = await fetch('/api/join-room', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -46,7 +41,6 @@ export function useCreateAndJoinRoom(gameSlug: string) {
         return;
       }
 
-      // 3. Success
       const fullRoomLink = `${window.location.origin}/${gameSlug}/${createdRoomCode}`;
       setRoomCode(createdRoomCode);
       setRoomLink(fullRoomLink);
