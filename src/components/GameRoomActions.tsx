@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { QRCodeSVG } from 'qrcode.react'
 import PrimaryButton from './PrimaryButton'
 import SecondaryButton from './SecondaryButton'
 import PrimaryTextbox from './PrimaryTextbox'
@@ -12,7 +11,6 @@ interface GameRoomActionsProps {
   onJoinRoom: (roomCode: string, playerName: string) => void
   creatorName: string
   setCreatorName: (name: string) => void
-  roomLink: string | null
   loading?: boolean
   error?: string | null
 }
@@ -22,13 +20,11 @@ export default function GameRoomActions({
   onJoinRoom,
   creatorName,
   setCreatorName,
-  roomLink,
   loading,
   error,
 }: GameRoomActionsProps) {
   const [joinName, setJoinName] = useState('')
   const [joinRoomCode, setJoinRoomCode] = useState('')
-  const [copied, setCopied] = useState(false)
 
   return (
     <div className="flex flex-col justify-center items-center w-full max-w-sm gap-10">
@@ -41,34 +37,6 @@ export default function GameRoomActions({
           onChange={(e) => setCreatorName(e.target.value)}
         />
         <PrimaryButton text={loading ? 'Creating...' : 'Create Game'} onClick={onCreateRoom} />
-
-        {roomLink && (
-          <div className="flex flex-col items-center gap-4 mt-4 w-full">
-            <p className="text-sm font-medium text-gray-700">Share this link with your teammates:</p>
-
-            <div className="relative w-full">
-              <input
-                type="text"
-                readOnly
-                value={roomLink}
-                className="w-full rounded-lg border border-pink-300 bg-white/70 px-4 py-2 text-sm text-gray-800 shadow-sm focus:outline-none"
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  navigator.clipboard.writeText(roomLink)
-                  setCopied(true)
-                  setTimeout(() => setCopied(false), 1500)
-                }}
-                className="absolute right-1 top-1/2 -translate-y-1/2 rounded-md bg-pink-200 px-3 py-1 text-xs font-medium text-pink-900 hover:bg-pink-300 transition"
-              >
-                {copied ? 'Copied!' : 'Copy'}
-              </button>
-            </div>
-
-            <QRCodeSVG value={roomLink} size={128} />
-          </div>
-        )}
       </div>
 
       {/* Horizontal OR Divider */}

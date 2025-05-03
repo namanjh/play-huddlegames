@@ -5,7 +5,7 @@ import { notFound, useRouter } from 'next/navigation'
 import { useState } from 'react'
 import GameRoomActions from '@/components/GameRoomActions'
 import FrostedContainer from '@/components/FrostedContainer'
-import { useCreateAndJoinRoom } from '@/lib/hooks/useCreateAndJoinRoom'
+import { useCreateRoom } from '@/lib/hooks/useCreateRoom'
 import { generateRandomName } from '@/lib/generateRandomName'
 
 interface GamePageProps {
@@ -16,7 +16,7 @@ export default function GamePage({ params }: GamePageProps) {
   const { game_slug } = use(params)
   const router = useRouter()
 
-  const { createAndJoinRoom, roomLink, loading, error } = useCreateAndJoinRoom(game_slug)
+  const { createRoom, loading, error } = useCreateRoom(game_slug)
   const [creatorName, setCreatorName] = useState(generateRandomName())
 
   const validGames = ['password-game', 'categories']
@@ -35,11 +35,10 @@ export default function GamePage({ params }: GamePageProps) {
       <div className="flex w-full max-w-7xl flex-col lg:flex-row items-start justify-center gap-12">
         <div className="w-full lg:w-1/2 flex justify-center items-center h-full">
           <GameRoomActions
-            onCreateRoom={() => createAndJoinRoom(creatorName)}
+            onCreateRoom={() => createRoom(creatorName)}
             onJoinRoom={handleJoinRoom}
             creatorName={creatorName}
             setCreatorName={setCreatorName}
-            roomLink={roomLink}
             loading={loading}
             error={error}
           />
