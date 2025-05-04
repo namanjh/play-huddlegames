@@ -5,6 +5,7 @@ import { notFound, useRouter } from 'next/navigation'
 import { useState } from 'react'
 import GameRoomActions from '@/components/GameRoomActions'
 import FrostedContainer from '@/components/FrostedContainer'
+import HowToSection from '@/components/HowToSection'
 import { useCreateRoom } from '@/lib/hooks/useCreateRoom'
 import { generateRandomName } from '@/lib/generateRandomName'
 
@@ -19,7 +20,7 @@ export default function GamePage({ params }: GamePageProps) {
   const { createRoom, loading, error } = useCreateRoom(game_slug)
   const [creatorName, setCreatorName] = useState(generateRandomName())
 
-  const validGames = ['password-game', 'categories']
+  const validGames = ['find-my-password', 'categories']
 
   if (!validGames.includes(game_slug)) {
     notFound()
@@ -46,25 +47,26 @@ export default function GamePage({ params }: GamePageProps) {
 
         {/* Right: How to Play / How to Win */}
         <div className="w-full lg:w-1/2 flex flex-col gap-6">
-          <FrostedContainer>
-            <h2 className="text-xl font-bold mb-4 text-pink-800">🎮 How to Play</h2>
-            <ul className="list-disc pl-6 text-sm text-gray-800">
-              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li>
-              <li>Aliquam tincidunt erat nec justo laoreet, eget elementum nulla tincidunt.</li>
-              <li>Curabitur ac leo vitae justo tincidunt blandit.</li>
-              <li>Quisque tincidunt velit sed magna porta, nec placerat augue commodo.</li>
-              <li>Donec convallis sem ut tellus viverra, a cursus justo rutrum.</li>
-            </ul>
-          </FrostedContainer>
-
-          <FrostedContainer>
-            <h2 className="text-xl font-bold mb-4 text-pink-800">🏆 How to Win</h2>
-            <ul className="list-disc pl-6 text-sm text-gray-800">
-              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li>
-              <li>Scoring is based on successful turns and minimal clues.</li>
-              <li>Time management and deduction are key!</li>
-            </ul>
-          </FrostedContainer>
+            <HowToSection
+                title="How to Play"
+                icon="🎮"
+                items={[
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+                'Aliquam tincidunt erat nec justo laoreet, eget elementum nulla tincidunt.',
+                'Curabitur ac leo vitae justo tincidunt blandit.',
+                'Quisque tincidunt velit sed magna porta, nec placerat augue commodo.',
+                'Donec convallis sem ut tellus viverra, a cursus justo rutrum.',
+                ]}
+            />
+            <HowToSection
+                title="How to Win"
+                icon="🏆"
+                items={[
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+                'Scoring is based on successful turns and minimal clues.',
+                'Time management and deduction are key!',
+                ]}
+            />
         </div>
       </div>
     </div>

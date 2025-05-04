@@ -2,19 +2,19 @@ import GameGrid from '@/components/GameCard'
 
 const dummyGames = [
   {
-    title: 'Password Game',
+    title: 'Find My Password',
     description: 'A fun word guessing game where you give one-word clues to guess the secret password.',
-    slug: 'password-game',
+    slug: 'find-my-password',
     tags: ['word', 'team', 'deduction'],
     imgSrc: '/static/images/find-my-password.png',
   },
-  {
-    title: 'Categories',
-    description: 'Pick a category and challenge your teammates to come up with answers that fit!',
-    slug: 'categories',
-    tags: ['quiz', 'team', 'fast'],
-    imgSrc: '/static/images/categories.png',
-  },
+//   {
+//     title: 'Categories',
+//     description: 'Pick a category and challenge your teammates to come up with answers that fit!',
+//     slug: 'categories',
+//     tags: ['quiz', 'team', 'fast'],
+//     imgSrc: '/static/images/categories.png',
+//   },
 ]
 
 export default function Home() {
