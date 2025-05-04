@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { savePlayerToStorage } from '@/utils/playerStorage'
 
 export function useCreateRoom(gameSlug: string) {
   const [loading, setLoading] = useState(false)
@@ -13,26 +14,30 @@ export function useCreateRoom(gameSlug: string) {
       setLoading(true)
       setError(null)
 
-      const res = await fetch('/api/create-room', {
+      const response = await fetch('/api/create-room', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          game_slug: gameSlug,
-          player_name: playerName,
-        }),
+        body: JSON.stringify({ game_slug: gameSlug, player_name: playerName }),
       })
 
-      const data = await res.json()
-
-      if (!res.ok) {
-        setError(data.error || 'Failed to create room')
-        return
+      const data = await response.json()
+      if (!response.ok) {
+        throw new Error(data.error || 'Room creation failed')
       }
 
-      const roomCode = data.room.room_code
-      router.push(`/${gameSlug}/${roomCode}`)
-    } catch (err) {
-      setError('Unexpected error occurred')
+      const { room, player } = data
+
+      savePlayerToStorage(room.room_code, {
+        player_name: player.player_name,
+        is_admin: true,
+        player_id: player.id,
+        room_id: room.id,
+        game_slug: gameSlug,
+      })
+
+      router.push(`/${gameSlug}/${room.room_code}`)
+    } catch (err: any) {
+      setError(err.message || 'Unexpected error')
     } finally {
       setLoading(false)
     }

@@ -1,35 +1,72 @@
+// src/app/[game_slug]/[room_code]/page.tsx
+
 'use client'
 
-import { use } from 'react'
+import { use, useEffect, useState } from 'react'
 import FrostedContainer from '@/components/FrostedContainer'
 import PrimaryButton from '@/components/PrimaryButton'
 import PlayerCard from '@/components/PlayerCard'
 import ShareQRCode from '@/components/ShareQRCode'
 import CopyRoomLink from '@/components/CopyRoomLink'
+import JoinPrompt from '@/components/JoinPrompt'
+import { getPlayerFromStorage } from '@/utils/playerStorage'
+import io from 'socket.io-client'
 
 interface RoomPageProps {
   params: Promise<{ game_slug: string; room_code: string }>
 }
 
+const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:4000')
+
 export default function RoomPage({ params }: RoomPageProps) {
   const { game_slug, room_code } = use(params)
+  const [localPlayer, setLocalPlayer] = useState<any | null>(null)
+  const [playerReady, setPlayerReady] = useState(false)
+  const [onlinePlayers, setOnlinePlayers] = useState<any[]>([])
 
-  const players = ['Alice', 'Bob', 'Charlie', 'Markand', 'HeroHiraLAL123123', 'retser', 'radomtest']
+  useEffect(() => {
+    const player = getPlayerFromStorage(room_code)
+    setLocalPlayer(player)
+    setPlayerReady(true)
+  }, [room_code])
+
+  useEffect(() => {
+    if (playerReady && localPlayer) {
+      socket.emit('join-room', {
+        roomCode: room_code,
+        player: localPlayer,
+      })
+
+      socket.on('players-update', (players) => {
+        setOnlinePlayers(players)
+      })
+
+      return () => {
+        socket.off('players-update')
+      }
+    }
+  }, [playerReady, localPlayer, room_code])
+
+  if (!playerReady) return null
+
+  if (!localPlayer) {
+    return <JoinPrompt gameSlug={game_slug} roomCode={room_code} />
+  }
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
+    <div className="flex flex-col overflow-hidden">
       {/* Main content */}
       <div className="flex-1 flex flex-col lg:flex-row gap-6 w-full max-w-7xl mx-auto px-6 pt-8 pb-28">
 
         {/* LEFT: Player List */}
         <div className="w-full lg:w-1/3 flex flex-col">
           <h2 className="text-xl font-bold text-pink-800 mb-2">
-            👥 Players in Room ({players.length})
+            👥 Players in Room ({onlinePlayers.length})
           </h2>
           <div className="flex-1 overflow-y-auto pr-1">
             <div className="flex flex-col gap-3">
-              {players.map((name, i) => (
-                <PlayerCard key={i} name={name} isAdmin={i === 0} />
+              {onlinePlayers.map((p) => (
+                <PlayerCard key={p.player_id} name={p.player_name} isAdmin={p.is_admin} />
               ))}
             </div>
           </div>
