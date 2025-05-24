@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import PrimaryTextbox from './PrimaryTextbox'
 import PrimaryButton from './PrimaryButton'
 import { savePlayerToStorage } from '@/utils/playerStorage'
+import { generateRandomName } from '@/lib/generateRandomName'
 
 interface JoinPromptProps {
   gameSlug: string
@@ -12,7 +13,7 @@ interface JoinPromptProps {
 }
 
 export default function JoinPrompt({ gameSlug, roomCode }: JoinPromptProps) {
-  const [name, setName] = useState('')
+  const [name, setName] = useState(generateRandomName())
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
@@ -38,13 +39,17 @@ export default function JoinPrompt({ gameSlug, roomCode }: JoinPromptProps) {
       game_slug: gameSlug,
     })
 
-    router.refresh() // Refreshes the page to load room UI
+    router.refresh()
   }
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center gap-6 px-4">
       <h1 className="text-2xl font-bold text-pink-700">Enter Your Name to Join</h1>
-      <PrimaryTextbox value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" />
+      <PrimaryTextbox
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Your name"
+      />
       <PrimaryButton text="Join Game" onClick={handleJoin} />
       {error && <p className="text-red-500 text-sm">{error}</p>}
     </div>

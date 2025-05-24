@@ -9,6 +9,7 @@ import PlayerCard from '@/components/PlayerCard'
 import ShareQRCode from '@/components/ShareQRCode'
 import CopyRoomLink from '@/components/CopyRoomLink'
 import JoinPrompt from '@/components/JoinPrompt'
+import HowToSection from '@/components/HowToSection'
 import { getPlayerFromStorage } from '@/utils/playerStorage'
 import io from 'socket.io-client'
 
@@ -86,22 +87,26 @@ export default function RoomPage({ params }: RoomPageProps) {
 
         {/* RIGHT: Rules */}
         <div className="w-full lg:w-1/3 flex flex-col gap-6">
-          <FrostedContainer>
-            <h2 className="text-xl font-bold mb-2 text-purple-800">🎮 How to Play</h2>
-            <ul className="list-disc pl-6 text-sm text-gray-800">
-              <li>Join the room and enter your name.</li>
-              <li>One person gives clues — others guess.</li>
-              <li>Alternate between teams. Time it!</li>
-            </ul>
-          </FrostedContainer>
-          <FrostedContainer>
-            <h2 className="text-xl font-bold mb-2 text-purple-800">🏆 How to Win</h2>
-            <ul className="list-disc pl-6 text-sm text-gray-800">
-              <li>Score more points than the other team.</li>
-              <li>Guess with fewer clues.</li>
-              <li>Time your turns and collaborate!</li>
-            </ul>
-          </FrostedContainer>
+            <HowToSection
+                title="How to Play"
+                icon="🎮"
+                titleColor="text-purple-800"
+                items={[
+                'Join the room and enter your name.',
+                'One person gives clues — others guess.',
+                'Alternate between teams. Time it!',
+                ]}
+            />
+            <HowToSection
+                title="How to Win"
+                icon="🏆"
+                titleColor="text-purple-800"
+                items={[
+                'Score more points than the other team.',
+                'Guess with fewer clues.',
+                'Time your turns and collaborate!',
+                ]}
+            />
         </div>
       </div>
 
