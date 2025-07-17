@@ -12,6 +12,7 @@ import JoinPrompt from '@/components/JoinPrompt'
 import HowToSection from '@/components/HowToSection'
 import { getPlayerFromStorage } from '@/utils/playerStorage'
 import io from 'socket.io-client'
+import { supabase } from '@/lib/supabaseClient' // Import supabase
 
 interface RoomPageProps {
   params: Promise<{ game_slug: string; room_code: string }>
@@ -24,12 +25,29 @@ export default function RoomPage({ params }: RoomPageProps) {
   const [localPlayer, setLocalPlayer] = useState<any | null>(null)
   const [playerReady, setPlayerReady] = useState(false)
   const [onlinePlayers, setOnlinePlayers] = useState<any[]>([])
+  const [gameDetails, setGameDetails] = useState<any>(null) // State to store game details
 
   useEffect(() => {
     const player = getPlayerFromStorage(room_code)
     setLocalPlayer(player)
     setPlayerReady(true)
-  }, [room_code])
+
+    // Fetch game details
+    const fetchGameDetails = async () => {
+      const { data, error } = await supabase
+        .from('games')
+        .select('*')
+        .eq('slug', game_slug)
+        .single()
+
+      if (error) {
+        console.error('Error fetching game details:', error)
+      } else {
+        setGameDetails(data)
+      }
+    }
+    fetchGameDetails()
+  }, [room_code, game_slug]) // Add game_slug to dependencies
 
   useEffect(() => {
     if (playerReady && localPlayer) {
@@ -48,10 +66,17 @@ export default function RoomPage({ params }: RoomPageProps) {
     }
   }, [playerReady, localPlayer, room_code])
 
-  if (!playerReady) return null
+  if (!playerReady || !gameDetails) return null // Wait for gameDetails to load
 
   if (!localPlayer) {
-    return <JoinPrompt gameSlug={game_slug} roomCode={room_code} />
+    return (
+      <JoinPrompt
+        gameSlug={game_slug}
+        roomCode={room_code}
+        gameName={gameDetails.name} // Pass game name
+        onPlayerJoined={setLocalPlayer}
+      />
+    )
   }
 
   return (
@@ -91,21 +116,13 @@ export default function RoomPage({ params }: RoomPageProps) {
                 title="How to Play"
                 icon="🎮"
                 titleColor="text-purple-800"
-                items={[
-                'Join the room and enter your name.',
-                'One person gives clues — others guess.',
-                'Alternate between teams. Time it!',
-                ]}
+                items={gameDetails.how_to_play || []} // Use fetched data
             />
             <HowToSection
                 title="How to Win"
                 icon="🏆"
                 titleColor="text-purple-800"
-                items={[
-                'Score more points than the other team.',
-                'Guess with fewer clues.',
-                'Time your turns and collaborate!',
-                ]}
+                items={gameDetails.how_to_win || []} // Use fetched data
             />
         </div>
       </div>
