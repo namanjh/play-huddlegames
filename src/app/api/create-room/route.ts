@@ -31,14 +31,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: roomError?.message }, { status: 400 })
   }
 
-  // 2. Create admin player
   const { data: player, error: playerError } = await supabase
     .from('players')
     .insert([
       {
         room_id: room.id,
         player_name,
-        team: 'team1',
+        team: 'Pink', // Changed from 'team1' to 'Pink'
         is_admin: true,
       },
     ])

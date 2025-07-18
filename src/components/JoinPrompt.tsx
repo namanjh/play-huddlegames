@@ -4,15 +4,15 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import PrimaryTextbox from './PrimaryTextbox'
 import PrimaryButton from './PrimaryButton'
-import HowToSection from './HowToSection' // Import HowToSection
-import { savePlayerToStorage } from '@/utils/playerStorage'
+import HowToSection from './HowToSection'
+import { savePlayerToStorage } from '@/utils/playerStorage' // Ensure savePlayerToStorage is imported
 import { generateRandomName } from '@/lib/generateRandomName'
 
 interface JoinPromptProps {
   gameSlug: string
   roomCode: string
-  gameName: string // New prop for game name
-  onPlayerJoined: (player: any) => void // Callback to update localPlayer in parent
+  gameName: string
+  onPlayerJoined: (player: any) => void
 }
 
 export default function JoinPrompt({
@@ -39,15 +39,12 @@ export default function JoinPrompt({
       return setError(data.error || 'Failed to join')
     }
 
-    savePlayerToStorage(roomCode, {
-      player_name: data.player.player_name,
-      is_admin: false,
-      player_id: data.player.id,
-      room_id: data.player.room_id,
-      game_slug: gameSlug,
-    })
+    // --- FIX STARTS HERE ---
+    // Save the entire player object returned from the API, which includes correct team and is_admin
+    savePlayerToStorage(roomCode, data.player)
+    // --- FIX ENDS HERE ---
 
-    onPlayerJoined(data.player) // Call the callback to update localPlayer in parent
+    onPlayerJoined(data.player)
   }
 
   // Dummy data for HowToSection
@@ -76,7 +73,10 @@ export default function JoinPrompt({
             onChange={(e) => setName(e.target.value)}
             placeholder="Your name"
           />
-          <PrimaryButton text="Join Game" onClick={handleJoin} />
+          <PrimaryButton
+            text="Join Game"
+            onClick={handleJoin}
+          />
           {error && <p className="text-red-500 text-sm">{error}</p>}
         </div>
 

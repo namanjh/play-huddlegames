@@ -10,9 +10,10 @@ import ShareQRCode from '@/components/ShareQRCode'
 import CopyRoomLink from '@/components/CopyRoomLink'
 import JoinPrompt from '@/components/JoinPrompt'
 import HowToSection from '@/components/HowToSection'
+import TeamDisplay from '@/components/TeamDisplay'
 import { getPlayerFromStorage } from '@/utils/playerStorage'
 import io from 'socket.io-client'
-import { supabase } from '@/lib/supabaseClient' // Import supabase
+import { supabase } from '@/lib/supabaseClient'
 
 interface RoomPageProps {
   params: Promise<{ game_slug: string; room_code: string }>
@@ -25,14 +26,13 @@ export default function RoomPage({ params }: RoomPageProps) {
   const [localPlayer, setLocalPlayer] = useState<any | null>(null)
   const [playerReady, setPlayerReady] = useState(false)
   const [onlinePlayers, setOnlinePlayers] = useState<any[]>([])
-  const [gameDetails, setGameDetails] = useState<any>(null) // State to store game details
+  const [gameDetails, setGameDetails] = useState<any>(null)
 
   useEffect(() => {
     const player = getPlayerFromStorage(room_code)
     setLocalPlayer(player)
     setPlayerReady(true)
 
-    // Fetch game details
     const fetchGameDetails = async () => {
       const { data, error } = await supabase
         .from('games')
@@ -47,7 +47,7 @@ export default function RoomPage({ params }: RoomPageProps) {
       }
     }
     fetchGameDetails()
-  }, [room_code, game_slug]) // Add game_slug to dependencies
+  }, [room_code, game_slug])
 
   useEffect(() => {
     if (playerReady && localPlayer) {
@@ -66,36 +66,31 @@ export default function RoomPage({ params }: RoomPageProps) {
     }
   }, [playerReady, localPlayer, room_code])
 
-  if (!playerReady || !gameDetails) return null // Wait for gameDetails to load
+  if (!playerReady || !gameDetails) return null
 
   if (!localPlayer) {
     return (
       <JoinPrompt
         gameSlug={game_slug}
         roomCode={room_code}
-        gameName={gameDetails.name} // Pass game name
+        gameName={gameDetails.name}
         onPlayerJoined={setLocalPlayer}
       />
     )
   }
+
+  const pinkTeamPlayers = onlinePlayers.filter(p => p.team === 'Pink');
+  const purpleTeamPlayers = onlinePlayers.filter(p => p.team === 'Purple');
 
   return (
     <div className="flex flex-col overflow-hidden">
       {/* Main content */}
       <div className="flex-1 flex flex-col lg:flex-row gap-6 w-full max-w-7xl mx-auto px-6 pt-8 pb-28">
 
-        {/* LEFT: Player List */}
-        <div className="w-full lg:w-1/3 flex flex-col">
-          <h2 className="text-xl font-bold text-pink-800 mb-2">
-            👥 Players in Room ({onlinePlayers.length})
-          </h2>
-          <div className="flex-1 overflow-y-auto pr-1">
-            <div className="flex flex-col gap-3">
-              {onlinePlayers.map((p) => (
-                <PlayerCard key={p.player_id} name={p.player_name} isAdmin={p.is_admin} />
-              ))}
-            </div>
-          </div>
+        {/* LEFT: Team Displays */}
+        <div className="w-full lg:w-1/3 flex flex-col gap-6">
+          <TeamDisplay teamName="Pink" players={pinkTeamPlayers} />
+          <TeamDisplay teamName="Purple" players={purpleTeamPlayers} />
         </div>
 
         {/* CENTER: Game Info + QR */}
@@ -116,13 +111,13 @@ export default function RoomPage({ params }: RoomPageProps) {
                 title="How to Play"
                 icon="🎮"
                 titleColor="text-purple-800"
-                items={gameDetails.how_to_play || []} // Use fetched data
+                items={gameDetails.how_to_play || []}
             />
             <HowToSection
                 title="How to Win"
                 icon="🏆"
                 titleColor="text-purple-800"
-                items={gameDetails.how_to_win || []} // Use fetched data
+                items={gameDetails.how_to_win || []}
             />
         </div>
       </div>

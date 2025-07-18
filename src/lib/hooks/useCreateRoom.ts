@@ -27,13 +27,7 @@ export function useCreateRoom(gameSlug: string) {
 
       const { room, player } = data
 
-      savePlayerToStorage(room.room_code, {
-        player_name: player.player_name,
-        is_admin: true,
-        player_id: player.id,
-        room_id: room.id,
-        game_slug: gameSlug,
-      })
+      savePlayerToStorage(room.room_code, player)
 
       router.push(`/${gameSlug}/${room.room_code}`)
     } catch (err: any) {
