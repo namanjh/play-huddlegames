@@ -28,16 +28,18 @@ export async function POST(request: NextRequest) {
     .single()
 
   if (roomError || !room) {
-    return NextResponse.json({ error: roomError?.message }, { status: 400 })
+    console.error('Supabase Room Creation Error:', roomError); // ADDED THIS LINE
+    return NextResponse.json({ error: roomError?.message || 'Failed to create room' }, { status: 400 })
   }
 
+  // 2. Create admin player
   const { data: player, error: playerError } = await supabase
     .from('players')
     .insert([
       {
         room_id: room.id,
         player_name,
-        team: 'Pink', // Changed from 'team1' to 'Pink'
+        team: null,
         is_admin: true,
       },
     ])
@@ -45,7 +47,8 @@ export async function POST(request: NextRequest) {
     .single()
 
   if (playerError || !player) {
-    return NextResponse.json({ error: 'Player not found!!' }, { status: 400 })
+    console.error('Supabase Player Creation Error:', playerError); // ADDED THIS LINE
+    return NextResponse.json({ error: playerError?.message || 'Failed to create player' }, { status: 400 })
   }
 
   // 3. Update room with admin_player_id
